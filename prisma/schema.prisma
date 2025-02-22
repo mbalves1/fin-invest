@@ -34,6 +34,7 @@ model Product {
   initialInvestment Float
   currentValue      Float
   isLiquid          Boolean
+  quantity          Int
 
   @@map("products")
 }
