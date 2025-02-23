@@ -14,18 +14,19 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int           @id @default(autoincrement())
+  email     String        @unique
   firstName String
   lastName  String
   birthday  DateTime
   isActive  Boolean?
+  products  UserProduct[]
 
   @@map("users")
 }
 
 model Product {
-  id                Int      @id @default(autoincrement())
+  id                Int           @id @default(autoincrement())
   bank              String
   rateType          String
   investmentDate    DateTime
@@ -35,6 +36,21 @@ model Product {
   currentValue      Float
   isLiquid          Boolean
   quantity          Int
+  users             UserProduct[]
 
   @@map("products")
+}
+
+model UserProduct {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  productId   Int
+  quantity    Int // Quantidade comprada
+  purchasedAt DateTime @default(now()) // Data da compra
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId]) // Garante que um usuário não compra o mesmo produto duas vezes sem registrar uma nova compra
+  @@map("user_products")
 }
