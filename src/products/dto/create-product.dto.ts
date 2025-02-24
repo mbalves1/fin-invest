@@ -2,10 +2,10 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
+  IsInt,
   IsNumber,
-  IsOptional,
   IsString,
-  ValidateNested,
+  Min,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -35,6 +35,10 @@ export class CreateProductDto {
   @IsBoolean()
   isLiquid: boolean;
 
-  @IsNumber()
+  @IsInt()
+  productId: number;
+
+  @IsInt()
+  @Min(1)
   quantity: number;
 }

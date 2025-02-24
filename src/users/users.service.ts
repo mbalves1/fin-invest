@@ -7,8 +7,18 @@ export class UsersService {
   constructor(private userRepo: UserRepository) {}
 
   async create(createUserDto: CreateUserDto): Promise<CreateUserDto> {
-    console.log(createUserDto);
-    return await this.userRepo.create(createUserDto);
+    const { products, ...userData } = createUserDto;
+    return await this.userRepo.create({
+      ...userData,
+      products: products
+        ? {
+            create: products.map((product) => ({
+              productId: product.productId,
+              quantity: product.quantity,
+            })),
+          }
+        : undefined,
+    });
   }
 
   async findAll(): Promise<any> {

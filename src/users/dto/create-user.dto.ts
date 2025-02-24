@@ -22,9 +22,9 @@ export class CreateUserDto {
   birthday: Date;
 
   @IsOptional()
-  @ValidateNested()
-  @Type(() => CreateProductDto)
-  products: CreateProductDto;
+  @ValidateNested({ each: true }) // Valida cada item da lista
+  @Type(() => CreateProductDto) // Converte corretamente os itens para DTO
+  products?: CreateProductDto[];
 
   @IsOptional()
   @IsBoolean()

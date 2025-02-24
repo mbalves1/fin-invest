@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UserProductsService } from './user-products.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
@@ -8,8 +16,10 @@ export class UserProductsController {
   constructor(private readonly userProductsService: UserProductsService) {}
 
   @Post()
-  create(@Body() createUserProductDto: CreateUserProductDto) {
-    return this.userProductsService.create(createUserProductDto);
+  async create(
+    @Body() createUserProductDto: CreateUserProductDto,
+  ): Promise<CreateUserProductDto> {
+    return await this.userProductsService.create(createUserProductDto);
   }
 
   @Get()
@@ -23,7 +33,10 @@ export class UserProductsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserProductDto: UpdateUserProductDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserProductDto: UpdateUserProductDto,
+  ) {
     return this.userProductsService.update(+id, updateUserProductDto);
   }
 
