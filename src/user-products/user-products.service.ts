@@ -13,8 +13,8 @@ export class UserProductsService {
     return await this.userProductRepo.create(createUserProductDto);
   }
 
-  findAll() {
-    return `This action returns all userProducts`;
+  async findAll() {
+    return this.userProductRepo.find();
   }
 
   findOne(id: number) {

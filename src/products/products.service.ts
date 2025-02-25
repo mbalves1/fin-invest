@@ -11,8 +11,8 @@ export class ProductsService {
     return await this.productRepo.create(createProductDto);
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll(): Promise<any> {
+    return this.productRepo.find();
   }
 
   findOne(id: number) {

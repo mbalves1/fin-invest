@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
+import { UserProduct } from 'src/types/userProductTypes';
 
 @Injectable()
 export class UserProductRepository {
@@ -28,8 +28,13 @@ export class UserProductRepository {
     });
   }
 
-  async find() {
-    const product = await this.prisma.product.findMany();
+  async find(): Promise<UserProduct[]> {
+    const product = await this.prisma.userProduct.findMany({
+      include: {
+        user: true, // Incluindo todos os dados do usuário
+        product: true, // Incluindo todos os dados do produto
+      },
+    });
     return product;
   }
 }
