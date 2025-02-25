@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id        Int           @id @default(autoincrement())
+  id        String        @unique
   email     String        @unique
   firstName String
   lastName  String
@@ -43,7 +43,7 @@ model Product {
 
 model UserProduct {
   id          Int      @id @default(autoincrement())
-  userId      Int
+  userId      String
   productId   Int
   quantity    Int // Quantidade comprada
   purchasedAt DateTime @default(now()) // Data da compra
