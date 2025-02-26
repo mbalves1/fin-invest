@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { User } from 'src/types/userProductTypes';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -13,5 +15,20 @@ export class UserRepository {
   async find() {
     const user = await this.prisma.user.findMany();
     return user;
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const { products, ...userData } = updateUserDto; // Desestruture para pegar os dados do usuário e excluir products
+
+    console.log(products);
+
+    return this.prisma.user.update({
+      where: {
+        id: id, // Encontrar o usuário pelo ID
+      },
+      data: {
+        ...userData, // Atualizar todos os dados do usuário, exceto os produtos
+      },
+    });
   }
 }

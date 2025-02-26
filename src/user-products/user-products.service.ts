@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
 import { UserProductRepository } from './user-product.repository';
+import { UserProduct } from 'src/types/userProductTypes';
 
 @Injectable()
 export class UserProductsService {
@@ -15,6 +16,10 @@ export class UserProductsService {
 
   async findAll() {
     return this.userProductRepo.find();
+  }
+
+  async findUserById(id: number): Promise<UserProduct[]> {
+    return this.userProductRepo.findByUser(id);
   }
 
   findOne(id: number) {

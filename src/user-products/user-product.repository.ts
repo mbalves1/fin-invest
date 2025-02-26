@@ -37,4 +37,18 @@ export class UserProductRepository {
     });
     return product;
   }
+
+  async findByUser(id: number): Promise<UserProduct[]> {
+    const product = await this.prisma.userProduct.findMany({
+      where: {
+        userId: id,
+      },
+      include: {
+        user: true,
+        product: true,
+      },
+    });
+
+    return product;
+  }
 }

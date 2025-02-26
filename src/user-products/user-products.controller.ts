@@ -27,6 +27,11 @@ export class UserProductsController {
     return this.userProductsService.findAll();
   }
 
+  @Get('/invest/:id')
+  findUserProducts(@Param('id') id: string) {
+    return this.userProductsService.findUserById(+id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userProductsService.findOne(+id);
