@@ -22,10 +22,10 @@ export interface Product {
 
 export interface UserProduct {
   id: number;
-  userId: number;
+  userId: string;
   productId: number;
   quantity: number;
   purchasedAt: Date;
-  user: User;
-  product: Product;
+  user: any;
+  product: any;
 }

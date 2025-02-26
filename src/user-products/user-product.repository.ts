@@ -15,7 +15,7 @@ export class UserProductRepository {
         quantity: purchaseData.quantity,
         purchasedAt: purchaseData.purchasedAt,
         user: {
-          connect: { id: userId },
+          connect: { id: String(userId) },
         },
         product: {
           connect: { id: productId },
