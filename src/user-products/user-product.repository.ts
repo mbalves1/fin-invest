@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UserProduct } from 'src/types/userProductTypes';
@@ -7,12 +11,26 @@ import { UserProduct } from 'src/types/userProductTypes';
 export class UserProductRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(body: CreateUserProductDto) {
-    const { userId, productId, ...purchaseData } = body;
+  async create(body: CreateUserProductDto): Promise<UserProduct> {
+    const { userId, productId, quantity, ...purchaseData } = body;
 
-    return await this.prisma.userProduct.create({
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    if (product.quantityRemaining < quantity) {
+      throw new BadRequestException('Quantity is not enough');
+    }
+
+    const userProduct = await this.prisma.userProduct.create({
       data: {
-        quantity: purchaseData.quantity,
+        quantity,
         purchasedAt: purchaseData.purchasedAt,
         user: {
           connect: { id: userId },
@@ -26,6 +44,17 @@ export class UserProductRepository {
         product: true, // Incluindo todos os dados do produto
       },
     });
+
+    await this.prisma.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        quantityRemaining: product.quantityRemaining - quantity,
+      },
+    });
+
+    return userProduct;
   }
 
   async find(): Promise<UserProduct[]> {

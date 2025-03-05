@@ -18,6 +18,10 @@ export interface Product {
   currentValue: number;
   isLiquid: boolean;
   quantity: number;
+  quantityRemaining: number;
+  risk: string;
+  investmentHorizon: string;
+  investmentType: string;
 }
 
 export interface UserProduct {
