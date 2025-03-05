@@ -41,4 +41,17 @@ export class CreateProductDto {
   @IsInt()
   @Min(1)
   quantity: number;
+
+  @IsInt()
+  @Min(1)
+  quantityRemaining: number;
+
+  @IsString()
+  risk: string; // Exemplo: 'low', 'medium', 'high'
+
+  @IsString()
+  investmentHorizon: string; // Exemplo: 'curto', 'medio', 'longo prazo'
+
+  @IsString()
+  investmentType: string; // Exemplo: 'stocks', 'renda fixa', 'imoveis'
 }
