@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsDate,
   ValidateNested,
+  IsNumber,
 } from 'class-validator';
 import { CreateProductDto } from 'src/products/dto/create-product.dto';
 
@@ -29,4 +30,16 @@ export class CreateUserDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean; // O campo isActive é opcional e se não for fornecido, o padrão será true
+
+  @IsString()
+  riskTolerance: string; // Exemplo: 'low', 'medium', 'high'
+
+  @IsString()
+  investmentGoals: string; // Exemplo: 'retirement', 'compra de imovel', 'education'
+
+  @IsNumber()
+  currentPortfolioValue: number; // Ex: R$ 5000
+
+  @IsString()
+  preferredInvestmentType: string; // Exemplo: 'stocks', 'renda fixa', 'imoveis'
 }

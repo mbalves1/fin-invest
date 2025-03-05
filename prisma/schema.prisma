@@ -14,13 +14,17 @@ datasource db {
 }
 
 model User {
-  id        Int           @id @default(autoincrement())
-  email     String        @unique
-  firstName String
-  lastName  String
-  birthday  DateTime
-  isActive  Boolean?
-  products  UserProduct[]
+  id                      Int           @id @default(autoincrement())
+  email                   String        @unique
+  firstName               String
+  lastName                String
+  birthday                DateTime
+  isActive                Boolean?
+  products                UserProduct[]
+  riskTolerance           String? // Exemplo: 'low', 'medium', 'high'
+  investmentGoals         String? // Exemplo: 'retirement', 'compra de imovel', 'education'
+  currentPortfolioValue   Float? // Ex: R$ 5000
+  preferredInvestmentType String? // Exemplo: 'stocks', 'renda fixa', 'imoveis'
 
   @@map("users")
 }
@@ -35,7 +39,11 @@ model Product {
   initialInvestment Float
   currentValue      Float
   isLiquid          Boolean
-  quantity          Int
+  quantity          Int // Quantidade inicial disponível
+  quantityRemaining Int? // Quantidade restante disponível
+  risk              String? // Exemplo: 'low', 'medium', 'high'
+  investmentHorizon String? // Exemplo: 'curto' "short_term", 'médio' mid_term, 'longo prazo' long_term
+  investmentType    String? // Exemplo: 'stocks', 'renda fixa', 'imoveis'
   users             UserProduct[]
 
   @@map("products")
