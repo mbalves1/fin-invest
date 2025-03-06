@@ -3,8 +3,8 @@ import { IsInt, Min, IsOptional } from 'class-validator';
 
 export class CreateUserProductDto {
   @IsInt()
-  @Type(() => Number)
-  userId: number;
+  @Type(() => String)
+  userId: string;
 
   @IsInt()
   @Type(() => Number)

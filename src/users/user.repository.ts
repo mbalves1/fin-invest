@@ -24,7 +24,7 @@ export class UserRepository {
 
     return this.prisma.user.update({
       where: {
-        id: id, // Encontrar o usuário pelo ID
+        id: String(id), // Encontrar o usuário pelo ID
       },
       data: {
         ...userData, // Atualizar todos os dados do usuário, exceto os produtos
