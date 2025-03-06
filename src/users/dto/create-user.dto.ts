@@ -11,6 +11,9 @@ import { CreateProductDto } from 'src/products/dto/create-product.dto';
 
 export class CreateUserDto {
   @IsString()
+  id: string;
+
+  @IsString()
   firstName: string;
 
   @IsString()

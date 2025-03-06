@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -26,7 +26,7 @@ export interface Product {
 
 export interface UserProduct {
   id: number;
-  userId: number;
+  userId: string;
   productId: number;
   quantity: number;
   purchasedAt: Date;

@@ -11,7 +11,10 @@ export class UserProductsService {
   async create(
     createUserProductDto: CreateUserProductDto,
   ): Promise<CreateUserProductDto> {
-    return await this.userProductRepo.create(createUserProductDto);
+    return await this.userProductRepo.create({
+      ...createUserProductDto,
+      userId: createUserProductDto.userId.toString(),
+    });
   }
 
   async findAll() {

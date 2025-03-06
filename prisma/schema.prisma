@@ -14,11 +14,11 @@ datasource db {
 }
 
 model User {
-  id                      Int           @id @default(autoincrement())
+  id                      String        @id
   email                   String        @unique
   firstName               String
   lastName                String
-  birthday                DateTime
+  birthday                DateTime?
   isActive                Boolean?
   products                UserProduct[]
   riskTolerance           String? // Exemplo: 'low', 'medium', 'high'
@@ -51,7 +51,7 @@ model Product {
 
 model UserProduct {
   id          Int      @id @default(autoincrement())
-  userId      Int
+  userId      String
   productId   Int
   quantity    Int // Quantidade comprada
   purchasedAt DateTime @default(now()) // Data da compra

@@ -33,7 +33,7 @@ export class UserProductRepository {
         quantity,
         purchasedAt: purchaseData.purchasedAt,
         user: {
-          connect: { id: userId },
+          connect: { id: String(userId) },
         },
         product: {
           connect: { id: productId },
@@ -70,7 +70,7 @@ export class UserProductRepository {
   async findByUser(id: number): Promise<UserProduct[]> {
     const product = await this.prisma.userProduct.findMany({
       where: {
-        userId: id,
+        userId: id.toString(),
       },
       include: {
         user: true,
