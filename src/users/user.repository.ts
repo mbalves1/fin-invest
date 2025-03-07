@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { User } from 'src/types/userProductTypes';
@@ -14,6 +14,18 @@ export class UserRepository {
 
   async find() {
     const user = await this.prisma.user.findMany();
+    return user;
+  }
+
+  async findOneUser(email: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (user) {
+      throw new ConflictException('E-mail already registered');
+    }
+
     return user;
   }
 
