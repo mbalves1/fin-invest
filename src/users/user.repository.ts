@@ -9,6 +9,21 @@ export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(body: Prisma.UserCreateInput): Promise<any> {
+    const existUserById = await this.prisma.user.findUnique({
+      where: { id: body.id },
+    });
+
+    if (existUserById) {
+      throw new ConflictException('Usuário com esse ID já existe');
+    }
+
+    // Verifica se o e-mail já existe
+    const existUserByEmail = await this.findOneUser(body.email);
+
+    if (existUserByEmail) {
+      throw new ConflictException('E-mail já registrado');
+    }
+
     return this.prisma.user.create({ data: body });
   }
 
