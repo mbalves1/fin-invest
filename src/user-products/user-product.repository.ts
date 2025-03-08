@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Req,
 } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
@@ -57,8 +58,13 @@ export class UserProductRepository {
     return userProduct;
   }
 
-  async find(): Promise<UserProduct[]> {
+  async find(@Req() req): Promise<UserProduct[]> {
+    const userId = req.user.id;
+
     const product = await this.prisma.userProduct.findMany({
+      where: {
+        userId,
+      },
       include: {
         user: true, // Incluindo todos os dados do usuário
         product: true, // Incluindo todos os dados do produto

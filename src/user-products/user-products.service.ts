@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req } from '@nestjs/common';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
 import { UserProductRepository } from './user-product.repository';
@@ -17,8 +17,8 @@ export class UserProductsService {
     });
   }
 
-  async findAll() {
-    return this.userProductRepo.find();
+  async findAll(@Req() req) {
+    return this.userProductRepo.find(req);
   }
 
   async findUserById(id: number): Promise<UserProduct[]> {

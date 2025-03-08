@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { UserProductsService } from './user-products.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('user-products')
 export class UserProductsController {
@@ -22,9 +25,10 @@ export class UserProductsController {
     return await this.userProductsService.create(createUserProductDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.userProductsService.findAll();
+  findAll(@Req() req) {
+    return this.userProductsService.findAll(req);
   }
 
   @Get('/invest/:id')
