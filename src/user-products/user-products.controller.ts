@@ -13,6 +13,7 @@ import { UserProductsService } from './user-products.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserProduct } from 'src/types/userProductTypes';
 
 @Controller('user-products')
 export class UserProductsController {
@@ -33,7 +34,7 @@ export class UserProductsController {
 
   @Get('/invest/:id')
   findUserProducts(@Param('id') id: string) {
-    return this.userProductsService.findUserById(+id);
+    return this.userProductsService.findUserById(id);
   }
 
   @Get(':id')
@@ -52,5 +53,13 @@ export class UserProductsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userProductsService.remove(+id);
+  }
+
+  @Post('sugestion/:id')
+  async createWallet(
+    @Param('id') id: string,
+    @Body() createUserProductDto: CreateUserProductDto,
+  ): Promise<any> {
+    return this.userProductsService.createWallet(id, createUserProductDto);
   }
 }

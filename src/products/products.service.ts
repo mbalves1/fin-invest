@@ -25,8 +25,8 @@ export class ProductsService {
     }
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productRepo.find();
+  async findAll(type?: string): Promise<Product[]> {
+    return this.productRepo.find(type);
   }
 
   async findOne(id: number): Promise<Product> {

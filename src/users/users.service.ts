@@ -2,6 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './user.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from 'src/types/userProductTypes';
 
 @Injectable()
 export class UsersService {
@@ -33,12 +34,12 @@ export class UsersService {
     return await this.userRepo.find();
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     return this.userRepo.update(id, updateUserDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string): Promise<User> {
+    return this.userRepo.findById(id);
   }
 
   remove(id: number) {

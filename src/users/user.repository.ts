@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { User } from 'src/types/userProductTypes';
@@ -44,14 +48,29 @@ export class UserRepository {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async findById(id: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    console.log('user', user);
+    console.log('id', id);
+
+    if (!user) {
+      throw new BadRequestException('User not found!');
+    }
+
+    return user;
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const { products, ...userData } = updateUserDto; // Desestruture para pegar os dados do usuário e excluir products
 
     console.log(products);
 
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: {
-        id: String(id), // Encontrar o usuário pelo ID
+        id, // Encontrar o usuário pelo ID
       },
       data: {
         ...userData, // Atualizar todos os dados do usuário, exceto os produtos

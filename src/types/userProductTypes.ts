@@ -5,6 +5,10 @@ export interface User {
   lastName: string;
   birthday: Date;
   isActive: boolean;
+  riskTolerance: string;
+  investmentGoals: string;
+  currentPortfolioValue: number;
+  preferredInvestmentType: string;
 }
 
 export interface Product {

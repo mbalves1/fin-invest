@@ -73,10 +73,10 @@ export class UserProductRepository {
     return product;
   }
 
-  async findByUser(id: number): Promise<UserProduct[]> {
+  async findByUser(id: string): Promise<UserProduct[]> {
     const product = await this.prisma.userProduct.findMany({
       where: {
-        userId: id.toString(),
+        userId: id,
       },
       include: {
         user: true,
