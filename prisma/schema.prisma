@@ -32,6 +32,7 @@ model User {
 model Product {
   id                Int           @id @default(autoincrement())
   bank              String
+  name              String        @default("")
   rateType          String
   investmentDate    DateTime
   dueDate           DateTime

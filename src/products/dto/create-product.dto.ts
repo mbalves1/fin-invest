@@ -13,6 +13,9 @@ export class CreateProductDto {
   bank: string;
 
   @IsString()
+  name: string;
+
+  @IsString()
   rateType: string;
 
   @IsDate()
