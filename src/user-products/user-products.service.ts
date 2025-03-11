@@ -32,23 +32,35 @@ export class UserProductsService {
   }
 
   async createWallet(id: string, createUserProductDto: CreateUserProductDto) {
-    const user = await this.userRepo.findById(id);
-    const riskTolerance = this.getPercentageByProfile(user.riskTolerance);
+    const { riskTolerance, currentPortfolioValue } =
+      await this.userRepo.findById(id);
+    const getProfilePercentage = this.getPercentageByProfile(riskTolerance);
 
-    console.log('user', user.currentPortfolioValue);
-    console.log('riskTolerance', riskTolerance);
+    const productsFixedIncome = await this.getProducts('fixed_income');
+    const productsRE = await this.getProducts('real_estate_funds');
+    const productsStocks = await this.getProducts('stocks');
 
-    const products = await this.getProducts();
-    console.log('products', products);
-
-    return createUserProductDto;
+    return {
+      fixed_income: {
+        offer: productsFixedIncome[0],
+        value: currentPortfolioValue * getProfilePercentage.fixed_income,
+      },
+      real_state_funds: {
+        offer: productsRE[0],
+        value: currentPortfolioValue * getProfilePercentage.real_estate_funds,
+      },
+      stocks: {
+        offer: productsStocks[0],
+        value: currentPortfolioValue * getProfilePercentage.stocks,
+      },
+    };
   }
 
-  async getProducts() {
-    return this.productRepo.find();
+  async getProducts(type: string) {
+    return this.productRepo.find(type);
   }
 
-  getPercentageByProfile(tolerance: string): Promise<any> {
+  getPercentageByProfile(tolerance: string) {
     const allocations = {
       conservative: {
         fixed_income: 0.9,

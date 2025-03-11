@@ -15,6 +15,7 @@ export class ProductRepository {
   async find(type?: string): Promise<Product[]> {
     const product = await this.prisma.product.findMany({
       where: type ? { investmentType: type } : {}, // 🔥 Mapeando `type` para `investmentType`
+      orderBy: { rate: 'desc' },
     });
     return product;
   }

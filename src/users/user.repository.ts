@@ -53,9 +53,6 @@ export class UserRepository {
       where: { id },
     });
 
-    console.log('user', user);
-    console.log('id', id);
-
     if (!user) {
       throw new BadRequestException('User not found!');
     }
