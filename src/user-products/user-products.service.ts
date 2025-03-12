@@ -1,3 +1,4 @@
+import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
 import { Injectable, Req } from '@nestjs/common';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
@@ -15,11 +16,12 @@ export class UserProductsService {
   ) {}
 
   async create(
+    userId: string,
     createUserProductDto: CreateUserProductDto,
   ): Promise<CreateUserProductDto> {
     return await this.userProductRepo.create({
       ...createUserProductDto,
-      userId: createUserProductDto.userId.toString(),
+      userId,
     });
   }
 
@@ -29,6 +31,20 @@ export class UserProductsService {
 
   async findUserById(id: string): Promise<UserProduct[]> {
     return this.userProductRepo.findByUser(id);
+  }
+
+  async createInvestments(
+    userId: string,
+    createInvestmentContractDto: CreateInvestmentContractDto,
+  ) {
+    const userInvestments = Object.entries(createInvestmentContractDto).map(
+      ([key, value]) => ({
+        ...value,
+      }),
+    );
+
+    userInvestments.forEach((invest) => this.create(userId, invest));
+    return 'Success';
   }
 
   async createWallet(id: string, createUserProductDto: CreateUserProductDto) {

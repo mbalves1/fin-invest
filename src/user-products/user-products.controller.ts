@@ -13,6 +13,7 @@ import { UserProductsService } from './user-products.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
 
 @Controller('user-products')
 export class UserProductsController {
@@ -21,9 +22,11 @@ export class UserProductsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
+    @Req() req,
     @Body() createUserProductDto: CreateUserProductDto,
   ): Promise<CreateUserProductDto> {
-    return await this.userProductsService.create(createUserProductDto);
+    const userId = req.user.id;
+    return await this.userProductsService.create(userId, createUserProductDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -33,8 +36,9 @@ export class UserProductsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/invest/:id')
-  findUserProducts(@Param('id') id: string) {
+  @Get('/invest')
+  findUserProducts(@Req() req) {
+    const id = req.user.id;
     return this.userProductsService.findUserById(id);
   }
 
@@ -59,11 +63,26 @@ export class UserProductsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('sugestion/:id')
+  @Get('/products/simulate')
   async createWallet(
-    @Param('id') id: string,
+    @Req() req,
     @Body() createUserProductDto: CreateUserProductDto,
   ): Promise<any> {
-    return this.userProductsService.createWallet(id, createUserProductDto);
+    // Promise<InvestmentResponse>
+    const userId = req.user.id;
+    return this.userProductsService.createWallet(userId, createUserProductDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/contract/confirm')
+  async createInvestments(
+    @Req() req,
+    @Body() createInvestmentContractDto: CreateInvestmentContractDto,
+  ): Promise<any> {
+    const userId = req.user.id;
+    return this.userProductsService.createInvestments(
+      userId,
+      createInvestmentContractDto,
+    );
   }
 }
