@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: meu_postgres
+    container_name: fin_postgres
     restart: always
     ports:
       - "5432:5432"
@@ -14,5 +14,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  app:
+    build: .
+    container_name: fin_app
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "npx prisma generate && npm run start"
+  
 volumes:
   postgres_data:
