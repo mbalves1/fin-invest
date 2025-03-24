@@ -12,6 +12,8 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from 'src/types/userProductTypes';
+import { CreateFixedIcomeProductDto } from './dto/create-fixed-income-product.dto';
+import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
 
 @Controller('products')
 export class ProductsController {
@@ -40,5 +42,18 @@ export class ProductsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productsService.remove(+id);
+  }
+
+  // Fixed Income
+  @Get('finxed_income/fixed')
+  getFixedIncome(): Promise<FixedIncome[]> {
+    return this.productsService.findFixedIncome();
+  }
+
+  @Post('fixed_income')
+  async createFixedIncome(
+    @Body() createFixedIcomeProductDto: CreateFixedIcomeProductDto,
+  ): Promise<FixedIncome> {
+    return this.productsService.createFixedIncome(createFixedIcomeProductDto);
   }
 }

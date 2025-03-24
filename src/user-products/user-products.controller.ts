@@ -15,7 +15,7 @@ import { UpdateUserProductDto } from './dto/update-user-product.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
 
-@Controller('user-products')
+@Controller('investments')
 export class UserProductsController {
   constructor(private readonly userProductsService: UserProductsService) {}
 

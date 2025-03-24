@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { Product } from 'src/types/userProductTypes';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
 
 @Injectable()
 export class ProductRepository {
@@ -43,5 +44,19 @@ export class ProductRepository {
         ...productData,
       },
     });
+  }
+
+  // Fixed Income
+  async findFixedIncome(): Promise<FixedIncome[]> {
+    console.log('Fetching fixed income investments...');
+
+    const fixedIncome = await this.prisma.fixedIncomeInvestment.findMany({});
+    return fixedIncome;
+  }
+
+  async createFixedIncome(
+    body: Prisma.FixedIncomeInvestmentCreateInput,
+  ): Promise<FixedIncome> {
+    return await this.prisma.fixedIncomeInvestment.create({ data: body });
   }
 }

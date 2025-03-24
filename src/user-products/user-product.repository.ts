@@ -29,7 +29,7 @@ export class UserProductRepository {
       throw new BadRequestException('Quantity is not enough');
     }
 
-    const userProduct = await this.prisma.userProduct.create({
+    const userProduct = await this.prisma.userInvestments.create({
       data: {
         quantity,
         purchasedAt: purchaseData.purchasedAt,
@@ -61,7 +61,7 @@ export class UserProductRepository {
   async find(@Req() req): Promise<UserProduct[]> {
     const userId = req.user.id;
 
-    const product = await this.prisma.userProduct.findMany({
+    const product = await this.prisma.userInvestments.findMany({
       where: {
         userId,
       },
@@ -74,7 +74,7 @@ export class UserProductRepository {
   }
 
   async findByUser(id: string): Promise<UserProduct[]> {
-    const product = await this.prisma.userProduct.findMany({
+    const product = await this.prisma.userInvestments.findMany({
       where: {
         userId: id,
       },

@@ -8,6 +8,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductRepository } from './product.repository';
 import { Product } from 'src/types/userProductTypes';
+import { CreateFixedIcomeProductDto } from './dto/create-fixed-income-product.dto';
+import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
 
 @Injectable()
 export class ProductsService {
@@ -45,5 +47,23 @@ export class ProductsService {
 
   remove(id: number) {
     return `This action removes a #${id} product`;
+  }
+
+  // Fixed Income
+  async findFixedIncome(): Promise<FixedIncome[]> {
+    const fixedIncome = await this.productRepo.findFixedIncome();
+    if (!fixedIncome) {
+      throw new NotFoundException('Nenhum investimento encontrado.');
+    }
+    return fixedIncome;
+  }
+
+  async createFixedIncome(
+    createFixedIcomeProductDto: CreateFixedIcomeProductDto,
+  ): Promise<FixedIncome> {
+    const fixedIncome = await this.productRepo.createFixedIncome(
+      createFixedIcomeProductDto,
+    );
+    return fixedIncome;
   }
 }
