@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id                      String        @id
-  email                   String        @unique
+  id                      String                  @id
+  email                   String                  @unique
   firstName               String
   lastName                String
   birthday                DateTime?
   isActive                Boolean?
-  products                UserProduct[]
+  products                UserInvestments[]
+  fixedIncomeInvestments  FixedIncomeInvestment[]
   riskTolerance           String? // Exemplo: 'Conservative', 'Moderate', 'Aggressive'
   investmentGoals         String? // Exemplo: 'retirement', 'compra de imovel', 'education'
   currentPortfolioValue   Float? // Ex: R$ 5000
@@ -30,9 +31,9 @@ model User {
 }
 
 model Product {
-  id                Int           @id @default(autoincrement())
+  id                Int               @id @default(autoincrement())
   bank              String
-  name              String        @default("")
+  name              String            @default("")
   rateType          String
   investmentDate    DateTime
   dueDate           DateTime
@@ -45,20 +46,94 @@ model Product {
   risk              String? // Exemplo: 'low', 'medium', 'high'
   investmentHorizon String? // Exemplo: 'curto' "short_term", 'médio' mid_term, 'longo prazo' long_term
   investmentType    String? // Exemplo: 'stocks', 'renda fixa', 'imoveis'
-  users             UserProduct[]
+  users             UserInvestments[]
 
   @@map("products")
 }
 
-model UserProduct {
+model FixedIncomeInvestment {
+  id                String   @id @default(uuid())
+  name              String
+  issuer            String // Instituição financeira emissora
+  type              String // Ex: CDB, LCI, LCA, etc.
+  interestRate      Float // Taxa de juros
+  interestType      String // Ex: Prefixado, Pós-fixado, Híbrido
+  indexer           String? // Ex: CDI, IPCA, Selic (se pós-fixado)
+  maturityDate      DateTime // Data de vencimento
+  liquidity         String // Ex: Diária, No vencimento
+  minimumInvestment Float // Aplicação mínima
+  taxation          String // Ex: IR, IOF, Isento
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  users  UserInvestments[]
+  User   User?             @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@map("fixed_income_investments")
+}
+
+model RealEstateFund {
+  id              String            @id @default(uuid())
+  name            String
+  ticker          String            @unique // Código de negociação (ex: KNRI11)
+  category        String // Ex: Tijolo, Papel, Híbrido
+  dividendYield   Float // Rendimento por cota
+  netWorth        Float // Patrimônio líquido
+  lastDividend    Float // Último dividendo pago
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  UserInvestments UserInvestments[]
+
+  @@map("real_estate_funds")
+}
+
+model Stock {
+  id              String            @id @default(uuid())
+  name            String
+  ticker          String            @unique // Código de negociação (ex: PETR4)
+  sector          String // Setor da empresa
+  marketCap       Float // Valor de mercado
+  dividendYield   Float? // Rendimento de dividendos (se aplicável)
+  lastPrice       Float // Último preço negociado
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  UserInvestments UserInvestments[]
+
+  @@map("stocks")
+}
+
+model Cryptocurrency {
+  id                String            @id @default(uuid())
+  name              String
+  symbol            String            @unique // Código da moeda (ex: BTC, ETH)
+  marketCap         Float // Capitalização de mercado
+  circulatingSupply Float // Quantidade em circulação
+  lastPrice         Float // Último preço negociado
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  UserInvestments   UserInvestments[]
+
+  @@map("crypto")
+}
+
+model UserInvestments {
   id          Int      @id @default(autoincrement())
   userId      String
   productId   Int
   quantity    Int // Quantidade comprada
   purchasedAt DateTime @default(now()) // Data da compra
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product               Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
+  FixedIncomeInvestment FixedIncomeInvestment? @relation(fields: [fixedIncomeId], references: [id])
+  fixedIncomeId         String?
+  RealEstateFund        RealEstateFund?        @relation(fields: [realEstateFundId], references: [id])
+  realEstateFundId      String?
+  Stock                 Stock?                 @relation(fields: [stockId], references: [id])
+  stockId               String?
+  Cryptocurrency        Cryptocurrency?        @relation(fields: [cryptoId], references: [id])
+  cryptoId              String?
 
-  @@map("user_products")
+  @@map("user_investments")
 }
