@@ -28,10 +28,8 @@ export class UserProductsController {
   // }
   @UseGuards(JwtAuthGuard)
   @Get('/user/contracts')
-  findUserProducts(@Req() req) {
+  findUserProducts(@Req() req): Promise<CreateInvestmentProductDto[]> {
     const id = req.user.id;
-    console.log('id', id);
-
     return this.userProductsService.findAll(id);
   }
 
@@ -46,11 +44,13 @@ export class UserProductsController {
     return this.userProductsService.createWallet(userId, createUserProductDto);
   }
 
-  @Post('/contract/:id')
+  @UseGuards(JwtAuthGuard)
+  @Post('/contract')
   async createInvestmentsContract(
-    @Param('id') id: string,
+    @Req() req,
     @Body() createInvestmentProductDto: CreateInvestmentProductDto,
-  ): Promise<any> {
+  ): Promise<CreateInvestmentProductDto> {
+    const id = req.user.id;
     return this.userProductsService.createAnInvestments(
       id,
       createInvestmentProductDto,

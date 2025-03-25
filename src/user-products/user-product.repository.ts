@@ -27,7 +27,7 @@ export class UserProductRepository {
   //   return product;
   // }
 
-  async find(@Req() req): Promise<any> {
+  async find(@Req() req): Promise<CreateInvestmentProductDto[]> {
     console.log('req...', req);
     const userId = req;
 
@@ -50,7 +50,7 @@ export class UserProductRepository {
   async createAnInvestment(
     userId: string,
     body: CreateInvestmentProductDto,
-  ): Promise<any> {
+  ): Promise<CreateInvestmentProductDto> {
     const { productId, quantity, ...purchaseData } = body;
     console.log('productId', productId);
     console.log('userId', userId);
