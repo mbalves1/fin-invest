@@ -39,11 +39,6 @@ export class ProductsController {
     return this.productsService.update(+id, updateProductDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
-  }
-
   // Fixed Income
   @Get('finxed_income/fixed')
   getFixedIncome(): Promise<FixedIncome[]> {
@@ -55,5 +50,18 @@ export class ProductsController {
     @Body() createFixedIcomeProductDto: CreateFixedIcomeProductDto,
   ): Promise<FixedIncome> {
     return this.productsService.createFixedIncome(createFixedIcomeProductDto);
+  }
+
+  // Real Estate
+  @Get('real_estate/re')
+  async getRealEstate(): Promise<any> {
+    return this.productsService.findRealEstate();
+  }
+
+  @Post('real_estate/re')
+  async createRealEstate(
+    @Body() createRealEstateProductDto: any,
+  ): Promise<any> {
+    return this.productsService.createRealEstate(createRealEstateProductDto);
   }
 }

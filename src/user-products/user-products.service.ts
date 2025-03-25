@@ -17,8 +17,6 @@ export class UserProductsService {
   ) {}
 
   async findAll(@Req() req) {
-    console.log('req', req);
-
     return this.userProductRepo.find(req);
   }
 
@@ -98,9 +96,5 @@ export class UserProductsService {
       userId,
       createInvestmentProductDto,
     );
-  }
-
-  async removeInvestment(id: number) {
-    return await this.userProductRepo.removeInvestment(id);
   }
 }

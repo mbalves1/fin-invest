@@ -56,9 +56,4 @@ export class UserProductsController {
       createInvestmentProductDto,
     );
   }
-
-  @Delete('/contract/:id')
-  async deleteInvestmentContract(@Param('id') id: string) {
-    return this.userProductsService.removeInvestment(+id);
-  }
 }

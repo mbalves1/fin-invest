@@ -59,4 +59,19 @@ export class ProductRepository {
   ): Promise<FixedIncome> {
     return await this.prisma.fixedIncomeInvestment.create({ data: body });
   }
+
+  // Real Estate
+  async findRealEstate(): Promise<any> {
+    console.log('Fetching real estate investments...');
+
+    const realEstate = await this.prisma.realEstateFund.findMany({});
+    return realEstate;
+  }
+
+  async createRealEstate(body: Prisma.RealEstateFundCreateInput): Promise<any> {
+    console.log('Creating real estate investment...');
+    return await this.prisma.realEstateFund.create({
+      data: body,
+    });
+  }
 }
