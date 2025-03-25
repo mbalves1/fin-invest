@@ -6,6 +6,7 @@ import { UserProductRepository } from './user-product.repository';
 import { UserProduct } from 'src/types/userProductTypes';
 import { UserRepository } from 'src/users/user.repository';
 import { ProductRepository } from 'src/products/product.repository';
+import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';
 
 @Injectable()
 export class UserProductsService {
@@ -15,37 +16,29 @@ export class UserProductsService {
     private productRepo: ProductRepository,
   ) {}
 
-  async create(
-    userId: string,
-    createUserProductDto: CreateUserProductDto,
-  ): Promise<CreateUserProductDto> {
-    return await this.userProductRepo.create({
-      ...createUserProductDto,
-      userId,
-    });
-  }
-
   async findAll(@Req() req) {
+    console.log('req', req);
+
     return this.userProductRepo.find(req);
   }
 
-  async findUserById(id: string): Promise<UserProduct[]> {
-    return this.userProductRepo.findByUser(id);
-  }
+  // async findUserById(id: string): Promise<UserProduct[]> {
+  //   return this.userProductRepo.findByUser(id);
+  // }
 
-  async createInvestments(
-    userId: string,
-    createInvestmentContractDto: CreateInvestmentContractDto,
-  ) {
-    const userInvestments = Object.entries(createInvestmentContractDto).map(
-      ([key, value]) => ({
-        ...value,
-      }),
-    );
+  // async createInvestments(
+  //   userId: string,
+  //   createInvestmentContractDto: CreateInvestmentContractDto,
+  // ) {
+  //   const userInvestments = Object.entries(createInvestmentContractDto).map(
+  //     ([key, value]) => ({
+  //       ...value,
+  //     }),
+  //   );
 
-    userInvestments.forEach((invest) => this.create(userId, invest));
-    return 'Success';
-  }
+  //   userInvestments.forEach((invest) => this.create(userId, invest));
+  //   return 'Success';
+  // }
 
   async createWallet(id: string, createUserProductDto: CreateUserProductDto) {
     const { riskTolerance, currentPortfolioValue } =
@@ -97,15 +90,17 @@ export class UserProductsService {
     return allocations[tolerance.toLowerCase()] || null;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} userProduct`;
+  async createAnInvestments(
+    userId: string,
+    createInvestmentProductDto: CreateInvestmentProductDto,
+  ): Promise<any> {
+    return await this.userProductRepo.createAnInvestment(
+      userId,
+      createInvestmentProductDto,
+    );
   }
 
-  update(id: number, updateUserProductDto: UpdateUserProductDto) {
-    return `This action updates a #${id} ${updateUserProductDto} userProduct`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} userProduct`;
+  async removeInvestment(id: number) {
+    return await this.userProductRepo.removeInvestment(id);
   }
 }

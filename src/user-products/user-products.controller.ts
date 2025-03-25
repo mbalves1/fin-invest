@@ -14,52 +14,25 @@ import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
+import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';
 
 @Controller('investments')
 export class UserProductsController {
   constructor(private readonly userProductsService: UserProductsService) {}
 
+  // @UseGuards(JwtAuthGuard)
+  // @Get('/invest')
+  // findUserProducts(@Req() req) {
+  //   const id = req.user.id;
+  //   return this.userProductsService.findUserById(id);
+  // }
   @UseGuards(JwtAuthGuard)
-  @Post()
-  async create(
-    @Req() req,
-    @Body() createUserProductDto: CreateUserProductDto,
-  ): Promise<CreateUserProductDto> {
-    const userId = req.user.id;
-    return await this.userProductsService.create(userId, createUserProductDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll(@Req() req) {
-    return this.userProductsService.findAll(req);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('/invest')
+  @Get('/user/contracts')
   findUserProducts(@Req() req) {
     const id = req.user.id;
-    return this.userProductsService.findUserById(id);
-  }
+    console.log('id', id);
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userProductsService.findOne(+id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserProductDto: UpdateUserProductDto,
-  ) {
-    return this.userProductsService.update(+id, updateUserProductDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userProductsService.remove(+id);
+    return this.userProductsService.findAll(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -73,16 +46,19 @@ export class UserProductsController {
     return this.userProductsService.createWallet(userId, createUserProductDto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('/contract/confirm')
-  async createInvestments(
-    @Req() req,
-    @Body() createInvestmentContractDto: CreateInvestmentContractDto,
+  @Post('/contract/:id')
+  async createInvestmentsContract(
+    @Param('id') id: string,
+    @Body() createInvestmentProductDto: CreateInvestmentProductDto,
   ): Promise<any> {
-    const userId = req.user.id;
-    return this.userProductsService.createInvestments(
-      userId,
-      createInvestmentContractDto,
+    return this.userProductsService.createAnInvestments(
+      id,
+      createInvestmentProductDto,
     );
+  }
+
+  @Delete('/contract/:id')
+  async deleteInvestmentContract(@Param('id') id: string) {
+    return this.userProductsService.removeInvestment(+id);
   }
 }

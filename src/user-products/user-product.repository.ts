@@ -7,83 +7,108 @@ import {
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UserProduct } from 'src/types/userProductTypes';
+import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';
 
 @Injectable()
 export class UserProductRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(body: CreateUserProductDto): Promise<UserProduct> {
-    const { userId, productId, quantity, ...purchaseData } = body;
+  // async findByUser(id: string): Promise<UserProduct[]> {
+  //   const product = await this.prisma.userInvestments.findMany({
+  //     where: {
+  //       userId: id,
+  //     },
+  //     include: {
+  //       user: true,
+  //       product: true,
+  //     },
+  //   });
 
-    const product = await this.prisma.product.findUnique({
-      where: {
-        id: productId,
-      },
-    });
+  //   return product;
+  // }
 
-    if (!product) {
+  async find(@Req() req): Promise<any> {
+    console.log('req...', req);
+    const userId = req;
+
+    const productFixedIncomeInvestment =
+      await this.prisma.userInvestments.findMany({
+        where: {
+          userId,
+        },
+        include: {
+          user: true, // Incluindo todos os dados do usuário
+          FixedIncomeInvestment: true, // Incluindo todos os dados do produto
+        },
+      });
+
+    console.log(productFixedIncomeInvestment);
+
+    return productFixedIncomeInvestment;
+  }
+
+  async createAnInvestment(
+    userId: string,
+    body: CreateInvestmentProductDto,
+  ): Promise<any> {
+    const { productId, quantity, ...purchaseData } = body;
+    console.log('productId', productId);
+    console.log('userId', userId);
+    console.log('Product ID:', productId, typeof productId);
+
+    // buscar o produto por id em cada uma dos repositories
+    const productFixedIncome =
+      await this.prisma.fixedIncomeInvestment.findUnique({
+        where: {
+          id: String(productId),
+        },
+      });
+
+    if (!productFixedIncome) {
       throw new NotFoundException('Product not found');
-    }
-
-    if (product.quantityRemaining < quantity) {
-      throw new BadRequestException('Quantity is not enough');
     }
 
     const userProduct = await this.prisma.userInvestments.create({
       data: {
-        quantity,
+        quantity: quantity,
         purchasedAt: purchaseData.purchasedAt,
         user: {
-          connect: { id: String(userId) },
+          connect: { id: userId },
         },
-        product: {
-          connect: { id: productId },
+        FixedIncomeInvestment: {
+          connect: { id: String(productId) },
         },
       },
       include: {
         user: true, // Incluindo todos os dados do usuário
-        product: true, // Incluindo todos os dados do produto
+        FixedIncomeInvestment: true, // Incluindo todos os dados do produto
       },
     });
 
-    await this.prisma.product.update({
-      where: {
-        id: productId,
-      },
-      data: {
-        quantityRemaining: product.quantityRemaining - quantity,
-      },
-    });
+    // await this.prisma.product.update({
+    //   where: {
+    //     id: productId,
+    //   },
+    //   data: {
+    //     quantityRemaining: productFixedIncome.quantityRemaining - quantity,
+    //   },
+    // });
 
+    console.log(body);
     return userProduct;
   }
 
-  async find(@Req() req): Promise<UserProduct[]> {
-    const userId = req.user.id;
+  async removeInvestment(productId: number): Promise<any> {
+    const productFixedIncome =
+      await this.prisma.fixedIncomeInvestment.findUnique({
+        where: {
+          id: String(productId),
+        },
+      });
 
-    const product = await this.prisma.userInvestments.findMany({
-      where: {
-        userId,
-      },
-      include: {
-        user: true, // Incluindo todos os dados do usuário
-        product: true, // Incluindo todos os dados do produto
-      },
-    });
-    return product;
-  }
-
-  async findByUser(id: string): Promise<UserProduct[]> {
-    const product = await this.prisma.userInvestments.findMany({
-      where: {
-        userId: id,
-      },
-      include: {
-        user: true,
-        product: true,
-      },
-    });
-
-    return product;
+    if (!productFixedIncome) {
+      throw new NotFoundException('Product not found');
+    }
+    // Implementar a lógica para remover investimentos
   }
 }
