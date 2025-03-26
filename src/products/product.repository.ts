@@ -50,15 +50,22 @@ export class ProductRepository {
 
   // Fixed Income
   async findFixedIncome(): Promise<FixedIncome[]> {
-    console.log('Fetching fixed income investments...');
-
-    const fixedIncome = await this.prisma.fixedIncomeInvestment.findMany({});
-    return fixedIncome;
+    return this.prisma.fixedIncomeInvestment.findMany({});
   }
 
   async createFixedIncome(
     body: Prisma.FixedIncomeInvestmentCreateInput,
   ): Promise<FixedIncome> {
+    const existProduct = await this.prisma.fixedIncomeInvestment.findFirst({
+      where: { name: body.name },
+    });
+
+    if (existProduct) {
+      throw new ConflictException(
+        `A fixed income investment with this name already exists ${body.name}`,
+      );
+    }
+
     return await this.prisma.fixedIncomeInvestment.create({ data: body });
   }
 
