@@ -11,6 +11,8 @@ import { Product } from 'src/types/userProductTypes';
 import { CreateFixedIcomeProductDto } from './dto/create-fixed-income-product.dto';
 import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
 import { CreateRealEstateFundDto } from './dto/create-real-estate-fund-product.dto';
+import { StockTypes } from 'src/types/stockTypes';
+import { RealEstateTypes } from 'src/types/realEstateTypes';
 
 @Injectable()
 export class ProductsService {
@@ -65,7 +67,7 @@ export class ProductsService {
   }
 
   // Real Estate
-  async findRealEstate(): Promise<any> {
+  async findRealEstate(): Promise<RealEstateTypes[]> {
     const realEstate = await this.productRepo.findRealEstate();
     if (!realEstate) {
       throw new NotFoundException('No product found.');
@@ -75,10 +77,23 @@ export class ProductsService {
 
   async createRealEstate(
     createRealEstateFundDto: CreateRealEstateFundDto,
-  ): Promise<any> {
+  ): Promise<RealEstateTypes> {
     const realEstate = await this.productRepo.createRealEstate(
       createRealEstateFundDto,
     );
     return realEstate;
+  }
+
+  // Stocks
+  async findStocks(): Promise<StockTypes[]> {
+    const stocks = await this.productRepo.findStock();
+    if (!stocks) {
+      throw new NotFoundException('No product found.');
+    }
+    return stocks;
+  }
+
+  async createStocks(body: Prisma.StockCreateInput): Promise<StockTypes> {
+    return this.productRepo.createStock(body);
   }
 }

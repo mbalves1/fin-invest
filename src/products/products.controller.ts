@@ -14,6 +14,11 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from 'src/types/userProductTypes';
 import { CreateFixedIcomeProductDto } from './dto/create-fixed-income-product.dto';
 import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
+import { StockTypes, StockTypesRequestBody } from 'src/types/stockTypes';
+import {
+  RealEstateTypes,
+  RealEstateTypesRequestBody,
+} from 'src/types/realEstateTypes';
 
 @Controller('products')
 export class ProductsController {
@@ -54,14 +59,27 @@ export class ProductsController {
 
   // Real Estate
   @Get('real_estate/re')
-  async getRealEstate(): Promise<any> {
+  async getRealEstate(): Promise<RealEstateTypes[]> {
     return this.productsService.findRealEstate();
   }
 
   @Post('real_estate/re')
   async createRealEstate(
-    @Body() createRealEstateProductDto: any,
+    @Body() createRealEstateProductDto: RealEstateTypesRequestBody,
   ): Promise<any> {
     return this.productsService.createRealEstate(createRealEstateProductDto);
+  }
+
+  // Stocks
+  @Get('stocks/sk')
+  async getStocks(): Promise<StockTypes[]> {
+    return this.productsService.findStocks();
+  }
+
+  @Post('stocks/sk')
+  async createStocks(
+    @Body() createStockProductDto: StockTypesRequestBody,
+  ): Promise<StockTypes> {
+    return this.productsService.createStocks(createStockProductDto);
   }
 }
