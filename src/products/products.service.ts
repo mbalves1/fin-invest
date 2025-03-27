@@ -1,3 +1,4 @@
+import { CreateCryptocurrencyDto } from './dto/create-crypto-product.dto';
 import { Prisma } from '@prisma/client';
 import {
   BadRequestException,
@@ -13,6 +14,8 @@ import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
 import { CreateRealEstateFundDto } from './dto/create-real-estate-fund-product.dto';
 import { StockTypes } from 'src/types/stockTypes';
 import { RealEstateTypes } from 'src/types/realEstateTypes';
+import { CryptoTypes } from 'src/types/cryptoTypes';
+import { CreateStockDto } from './dto/create-stocks-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -93,7 +96,22 @@ export class ProductsService {
     return stocks;
   }
 
-  async createStocks(body: Prisma.StockCreateInput): Promise<StockTypes> {
-    return this.productRepo.createStock(body);
+  async createStocks(createStockDto: CreateStockDto): Promise<StockTypes> {
+    return this.productRepo.createStock(createStockDto);
+  }
+
+  // Crypto
+  async findCrypto(): Promise<CryptoTypes[]> {
+    const crypto = await this.productRepo.findCrypto();
+    if (!crypto) {
+      throw new NotFoundException('No product found.');
+    }
+    return crypto;
+  }
+
+  async createCrypto(
+    createCryptocurrencyDto: CreateCryptocurrencyDto,
+  ): Promise<CryptoTypes> {
+    return this.productRepo.createCrypto(createCryptocurrencyDto);
   }
 }

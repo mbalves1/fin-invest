@@ -6,6 +6,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
 import { StockTypes } from 'src/types/stockTypes';
 import { RealEstateTypes } from 'src/types/realEstateTypes';
+import { CryptoTypes } from 'src/types/cryptoTypes';
 
 @Injectable()
 export class ProductRepository {
@@ -109,5 +110,26 @@ export class ProductRepository {
     }
 
     return this.prisma.stock.create({ data: body });
+  }
+
+  // Crypto
+  async findCrypto(): Promise<CryptoTypes[]> {
+    return this.prisma.cryptocurrency.findMany({});
+  }
+
+  async createCrypto(
+    body: Prisma.CryptocurrencyCreateInput,
+  ): Promise<CryptoTypes> {
+    const existCrypto = await this.prisma.cryptocurrency.findUnique({
+      where: { symbol: body.symbol },
+    });
+
+    if (existCrypto) {
+      throw new ConflictException(
+        `A cryptocurrency with this symbol already exists ${body.symbol}`,
+      );
+    }
+
+    return this.prisma.cryptocurrency.create({ data: body });
   }
 }

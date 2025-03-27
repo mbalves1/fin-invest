@@ -26,6 +26,7 @@ export class UserProductsController {
   //   const id = req.user.id;
   //   return this.userProductsService.findUserById(id);
   // }
+
   @UseGuards(JwtAuthGuard)
   @Get('/user/contracts')
   findUserProducts(@Req() req): Promise<CreateInvestmentProductDto[]> {
@@ -35,13 +36,17 @@ export class UserProductsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/products/simulate')
-  async createWallet(
+  async simulateWallet(
     @Req() req,
     @Body() createUserProductDto: CreateUserProductDto,
   ): Promise<any> {
     // Promise<InvestmentResponse>
     const userId = req.user.id;
-    return this.userProductsService.createWallet(userId, createUserProductDto);
+
+    return this.userProductsService.simulateWallet(
+      userId,
+      createUserProductDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -51,7 +56,24 @@ export class UserProductsController {
     @Body() createInvestmentProductDto: CreateInvestmentProductDto,
   ): Promise<CreateInvestmentProductDto> {
     const id = req.user.id;
+    console.log('id', createInvestmentProductDto);
+
     return this.userProductsService.createAnInvestments(
+      id,
+      createInvestmentProductDto,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('simple/contract')
+  async createSimpleInvestmentsContract(
+    @Req() req,
+    @Body() createInvestmentProductDto: CreateInvestmentProductDto,
+  ): Promise<CreateInvestmentProductDto> {
+    const id = req.user.id;
+    console.log('id', createInvestmentProductDto);
+
+    return this.userProductsService.createSimpleAnInvestment(
       id,
       createInvestmentProductDto,
     );

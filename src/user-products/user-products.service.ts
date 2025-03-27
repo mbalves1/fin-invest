@@ -7,6 +7,8 @@ import { UserProduct } from 'src/types/userProductTypes';
 import { UserRepository } from 'src/users/user.repository';
 import { ProductRepository } from 'src/products/product.repository';
 import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';
+import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
+import { StockTypes } from 'src/types/stockTypes';
 
 @Injectable()
 export class UserProductsService {
@@ -38,33 +40,97 @@ export class UserProductsService {
   //   return 'Success';
   // }
 
-  async createWallet(id: string, createUserProductDto: CreateUserProductDto) {
+  async simulateWallet(id: string, createUserProductDto: CreateUserProductDto) {
     const { riskTolerance, currentPortfolioValue } =
       await this.userRepo.findById(id);
-    const getProfilePercentage = this.getPercentageByProfile(riskTolerance);
 
-    const productsFixedIncome = await this.getProducts('fixed_income');
-    const productsRE = await this.getProducts('real_estate_funds');
-    const productsStocks = await this.getProducts('stocks');
+    const percentageProfile = this.getPercentageByProfile(riskTolerance);
 
-    return {
+    // Essa variavel deve retornar os produtos fixed income,
+    const productsFixedIncome = await this.getProductsFixedIncome(
+      percentageProfile.fixed_income * currentPortfolioValue,
+    );
+    // preciso verificar se a porcentagem pra investir e maior que o minimo
+    // se nao investir o maximo que da e vai para o proximo
+
+    const productsRE = await this.getProductsRealEstate();
+    const productsStocks = await this.getProductsStocks();
+    const productsCrypto = await this.getProductsCrypto();
+
+    const result = {
       fixed_income: {
-        offer: productsFixedIncome[0],
-        value: currentPortfolioValue * getProfilePercentage.fixed_income,
+        offer: productsFixedIncome,
+        value: currentPortfolioValue * percentageProfile.fixed_income,
       },
       real_state_funds: {
-        offer: productsRE[0],
-        value: currentPortfolioValue * getProfilePercentage.real_estate_funds,
+        offer: productsRE,
+        value: currentPortfolioValue * percentageProfile.real_estate_funds,
       },
       stocks: {
-        offer: productsStocks[0],
-        value: currentPortfolioValue * getProfilePercentage.stocks,
+        offer: productsStocks,
+        value: currentPortfolioValue * percentageProfile.stocks,
+      },
+      productsCrypto: {
+        offer: productsCrypto,
+        value: currentPortfolioValue * percentageProfile.crypto,
       },
     };
+
+    return result;
   }
 
-  async getProducts(type: string) {
-    return this.productRepo.find(type);
+  // Get Products from Fixed Income.
+  async getProductsFixedIncome(
+    currentValueToInvest: number,
+  ): Promise<FixedIncome> {
+    const allProducts = await this.productRepo.findFixedIncome();
+    const sortByHighestRate = allProducts.sort(
+      (a, b) => b.interestRate - a.interestRate,
+    );
+
+    const applicableProduct = sortByHighestRate.find(
+      (product) => product.minimumInvestment <= currentValueToInvest,
+    );
+
+    return applicableProduct;
+  }
+
+  // Get Products from Real Estate
+  // Maior yield maior rendimento maior patrimonio maior seguranca
+  async getProductsRealEstate() {
+    const allProducts = await this.productRepo.findRealEstate();
+    const applicableProduct = allProducts.sort(
+      (a, b) => b.dividendYield - a.dividendYield,
+    );
+    return applicableProduct[0];
+  }
+
+  // Get Products from Stocks
+  async getProductsStocks(): Promise<StockTypes> {
+    const allProducts = await this.productRepo.findStock();
+    // Ordena primeiro pelo maior Dividend Yield, depois pelo maior Market Cap
+    allProducts.sort((a, b) => {
+      if (b.dividendYield !== a.dividendYield) {
+        return b.dividendYield - a.dividendYield;
+      }
+      return b.marketCap - a.marketCap;
+    });
+
+    return allProducts[0]; // Retorna a melhor ação
+  }
+
+  // Get Products from Crypto
+  async getProductsCrypto(): Promise<any> {
+    const allProducts = await this.productRepo.findCrypto();
+    // Ordena primeiro pelo maior Market Cap, depois pelo maior preço unitário
+    allProducts.sort((a, b) => {
+      if (b.marketCap !== a.marketCap) {
+        return b.marketCap - a.marketCap;
+      }
+      return b.lastPrice - a.lastPrice;
+    });
+
+    return allProducts[0];
   }
 
   getPercentageByProfile(tolerance: string) {
@@ -93,6 +159,16 @@ export class UserProductsService {
     createInvestmentProductDto: CreateInvestmentProductDto,
   ): Promise<any> {
     return await this.userProductRepo.createAnInvestment(
+      userId,
+      createInvestmentProductDto,
+    );
+  }
+
+  async createSimpleAnInvestment(
+    userId: string,
+    createInvestmentProductDto: CreateInvestmentProductDto,
+  ): Promise<any> {
+    return await this.userProductRepo.createSimpleInvestment(
       userId,
       createInvestmentProductDto,
     );

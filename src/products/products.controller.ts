@@ -19,6 +19,8 @@ import {
   RealEstateTypes,
   RealEstateTypesRequestBody,
 } from 'src/types/realEstateTypes';
+import { CryptoTypes } from 'src/types/cryptoTypes';
+import { CreateCryptocurrencyDto } from './dto/create-crypto-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -34,18 +36,13 @@ export class ProductsController {
     return this.productsService.findAll(type);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<Product> {
-    return this.productsService.findOne(+id);
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(+id, updateProductDto);
   }
 
   // Fixed Income
-  @Get('finxed_income/fixed')
+  @Get('finxed_income')
   getFixedIncome(): Promise<FixedIncome[]> {
     return this.productsService.findFixedIncome();
   }
@@ -58,12 +55,12 @@ export class ProductsController {
   }
 
   // Real Estate
-  @Get('real_estate/re')
+  @Get('real_estate')
   async getRealEstate(): Promise<RealEstateTypes[]> {
     return this.productsService.findRealEstate();
   }
 
-  @Post('real_estate/re')
+  @Post('real_estate')
   async createRealEstate(
     @Body() createRealEstateProductDto: RealEstateTypesRequestBody,
   ): Promise<any> {
@@ -71,15 +68,35 @@ export class ProductsController {
   }
 
   // Stocks
-  @Get('stocks/sk')
+  @Get('stocks')
   async getStocks(): Promise<StockTypes[]> {
     return this.productsService.findStocks();
   }
 
-  @Post('stocks/sk')
+  @Post('stocks')
   async createStocks(
     @Body() createStockProductDto: StockTypesRequestBody,
   ): Promise<StockTypes> {
     return this.productsService.createStocks(createStockProductDto);
+  }
+
+  // Crypto
+  @Get('crypto')
+  async getCrypto(): Promise<CryptoTypes[]> {
+    return this.productsService.findCrypto();
+  }
+
+  @Post('crypto')
+  async createCrypto(
+    @Body() createCryptoProductDto: CreateCryptocurrencyDto,
+  ): Promise<CryptoTypes> {
+    return this.productsService.createCrypto(createCryptoProductDto);
+  }
+
+  // end Crypto
+
+  @Get(':id')
+  findOne(@Param('id') id: string): Promise<Product> {
+    return this.productsService.findOne(+id);
   }
 }
