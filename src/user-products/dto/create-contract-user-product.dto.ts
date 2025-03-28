@@ -17,4 +17,7 @@ export class CreateInvestmentContractDto {
 
   @IsObject()
   stock: InvestmentEntry;
+
+  @IsObject()
+  crypto: InvestmentEntry;
 }

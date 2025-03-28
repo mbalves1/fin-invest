@@ -9,6 +9,7 @@ import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UserProduct } from 'src/types/userProductTypes';
 import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';
 import { Prisma } from '@prisma/client';
+import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
 
 @Injectable()
 export class UserProductRepository {
@@ -126,7 +127,7 @@ export class UserProductRepository {
 
     // Se não encontrar o produto em nenhuma tabela, lança um erro
     if (!fixedIncome && !realEstateFund && !stock && !cryptocurrency) {
-      throw new Error('O produto de investimento não existe.');
+      throw new NotFoundException('Product not found!');
     }
 
     // Monta o objeto de conexão dinamicamente
@@ -221,45 +222,37 @@ export class UserProductRepository {
 
   async createAnInvestment(
     userId: string,
-    body: CreateInvestmentProductDto,
+    body: CreateInvestmentContractDto,
   ): Promise<any> {
-    const { productId, quantity, ...purchaseData } = body;
+    console.log('userId', userId);
 
     // Buscar o produto de Renda Fixa
-    const productFixedIncome = await this.findFixedIncomeProduct(
-      String(productId),
-    );
+    const fixedIncome = await this.prisma.fixedIncomeInvestment.findUnique({
+      where: { id: String(body?.fixed_income?.productId) },
+    });
 
-    // Buscar o produto de Fundo Imobiliário
-    const productRealEstate = await this.findRealEstateProduct(
-      String(productId),
-    );
+    const realEstateFund = await this.prisma.realEstateFund.findUnique({
+      where: { id: String(body?.real_state?.productId) },
+    });
 
-    // Buscar o produto de Ações
-    const productStock = await this.findStocksProduct(String(productId));
+    const stock = await this.prisma.stock.findUnique({
+      where: { id: String(body?.stock?.productId) },
+    });
 
-    const productCrypto = await this.findCryptoProduct(String(productId));
+    const cryptocurrency = await this.prisma.cryptocurrency.findUnique({
+      where: { id: String(body?.crypto?.productId) },
+    });
 
-    // Verifica se ambos os produtos não foram encontrados
-    if (
-      !productFixedIncome &&
-      !productRealEstate &&
-      !productStock &&
-      !productCrypto
-    ) {
-      throw new NotFoundException('Product not found');
+    // Se não encontrar o produto em nenhuma tabela, lança um erro
+    if (!fixedIncome && !realEstateFund && !stock && !cryptocurrency) {
+      throw new NotFoundException('Product not found!...');
     }
 
-    // Cria o investimento do usuário
-    const userProduct = await this.createUserInvestment(
-      userId,
-      String(productId),
-      quantity,
-      purchaseData.purchasedAt,
-      productFixedIncome,
-      productRealEstate,
-    );
+    const investmentEntries = Object.entries(body);
+    console.log(investmentEntries);
 
-    return userProduct;
+    // Mapeia os investimentos para inserção no banco
+
+    return;
   }
 }

@@ -53,14 +53,13 @@ export class UserProductsController {
   @Post('/contract')
   async createInvestmentsContract(
     @Req() req,
-    @Body() createInvestmentProductDto: CreateInvestmentProductDto,
-  ): Promise<CreateInvestmentProductDto> {
+    @Body() createInvestmentContractDto: CreateInvestmentContractDto,
+  ): Promise<CreateInvestmentContractDto> {
     const id = req.user.id;
-    console.log('id', createInvestmentProductDto);
 
     return this.userProductsService.createAnInvestments(
       id,
-      createInvestmentProductDto,
+      createInvestmentContractDto,
     );
   }
 
@@ -71,7 +70,6 @@ export class UserProductsController {
     @Body() createInvestmentProductDto: CreateInvestmentProductDto,
   ): Promise<CreateInvestmentProductDto> {
     const id = req.user.id;
-    console.log('id', createInvestmentProductDto);
 
     return this.userProductsService.createSimpleAnInvestment(
       id,

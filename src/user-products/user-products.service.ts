@@ -156,11 +156,11 @@ export class UserProductsService {
 
   async createAnInvestments(
     userId: string,
-    createInvestmentProductDto: CreateInvestmentProductDto,
+    createInvestmentContractDto: CreateInvestmentContractDto,
   ): Promise<any> {
     return await this.userProductRepo.createAnInvestment(
       userId,
-      createInvestmentProductDto,
+      createInvestmentContractDto,
     );
   }
 
