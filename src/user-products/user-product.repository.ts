@@ -1,15 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  Req,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, Req } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { CreateUserProductDto } from './dto/create-user-product.dto';
-import { UserProduct } from 'src/types/userProductTypes';
 import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';
-import { Prisma } from '@prisma/client';
 import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
+
+interface InvestmentResponse {
+  message: string;
+  success: boolean;
+  timestamp: Date;
+}
 
 @Injectable()
 export class UserProductRepository {
@@ -162,70 +160,10 @@ export class UserProductRepository {
     });
   }
 
-  async createUserInvestment(
-    userId: string,
-    productId: string,
-    quantity: number,
-    purchasedAt: Date,
-    productFixedIncome: any,
-    productRealEstate: any,
-  ) {
-    let userProduct;
-
-    // Verificando se o produto é de Renda Fixa
-    if (productFixedIncome) {
-      userProduct = await this.prisma.userInvestments.create({
-        data: {
-          quantity: quantity,
-          purchasedAt: purchasedAt,
-          user: {
-            connect: { id: userId },
-          },
-          FixedIncomeInvestment: {
-            connect: { id: productId },
-          },
-        },
-        include: {
-          user: true,
-          FixedIncomeInvestment: true, // Inclui o produto de Renda Fixa
-        },
-      });
-    }
-
-    // Verificando se o produto é um Fundo Imobiliário
-    else if (productRealEstate) {
-      userProduct = await this.prisma.userInvestments.create({
-        data: {
-          quantity: quantity,
-          purchasedAt: purchasedAt,
-          user: {
-            connect: { id: userId },
-          },
-          RealEstateFund: {
-            connect: { id: productId },
-          },
-        },
-        include: {
-          user: true,
-          RealEstateFund: true, // Inclui o Fundo Imobiliário
-        },
-      });
-    }
-
-    // Se nenhum dos tipos de produto for encontrado, lança um erro
-    if (!userProduct) {
-      throw new NotFoundException('Product type not found');
-    }
-
-    return userProduct;
-  }
-
   async createAnInvestment(
     userId: string,
     body: CreateInvestmentContractDto,
-  ): Promise<any> {
-    console.log('userId', userId);
-
+  ): Promise<InvestmentResponse> {
     // Buscar o produto de Renda Fixa
     const fixedIncome = await this.prisma.fixedIncomeInvestment.findUnique({
       where: { id: String(body?.fixed_income?.productId) },
@@ -249,10 +187,20 @@ export class UserProductRepository {
     }
 
     const investmentEntries = Object.entries(body);
-    console.log(investmentEntries);
+    investmentEntries.map((item) => {
+      const product = {
+        productId: item[1].productId,
+        quantity: item[1].quantity,
+        userId: userId,
+      };
 
-    // Mapeia os investimentos para inserção no banco
+      this.createSimpleInvestment(userId, product);
+    });
 
-    return;
+    return {
+      message: 'Contract done',
+      success: true,
+      timestamp: new Date(),
+    };
   }
 }
