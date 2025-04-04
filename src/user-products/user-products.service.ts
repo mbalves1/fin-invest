@@ -83,7 +83,7 @@ export class UserProductsService {
   async getProductsFixedIncome(
     currentValueToInvest: number,
   ): Promise<FixedIncome> {
-    const allProducts = await this.productRepo.findFixedIncome();
+    const allProducts = await this.userProductRepo.findAllFixedIncome();
     const sortByHighestRate = allProducts.sort(
       (a, b) => b.interestRate - a.interestRate,
     );
@@ -98,16 +98,16 @@ export class UserProductsService {
   // Get Products from Real Estate
   // Maior yield maior rendimento maior patrimonio maior seguranca
   async getProductsRealEstate() {
-    const allProducts = await this.productRepo.findRealEstate();
+    const allProducts = await this.userProductRepo.findAllRealEstate();
     const applicableProduct = allProducts.sort(
-      (a, b) => b.dividendYield - a.dividendYield,
+      (a: any, b: any) => b.dividendYield - a.dividendYield,
     );
     return applicableProduct[0];
   }
 
   // Get Products from Stocks
   async getProductsStocks(): Promise<StockTypes> {
-    const allProducts = await this.productRepo.findStock();
+    const allProducts = await this.userProductRepo.findAllStocksProduct();
     // Ordena primeiro pelo maior Dividend Yield, depois pelo maior Market Cap
     allProducts.sort((a, b) => {
       if (b.dividendYield !== a.dividendYield) {
@@ -121,7 +121,7 @@ export class UserProductsService {
 
   // Get Products from Crypto
   async getProductsCrypto(): Promise<any> {
-    const allProducts = await this.productRepo.findCrypto();
+    const allProducts = await this.userProductRepo.findAllCryptoProduct();
     // Ordena primeiro pelo maior Market Cap, depois pelo maior preço unitário
     allProducts.sort((a, b) => {
       if (b.marketCap !== a.marketCap) {

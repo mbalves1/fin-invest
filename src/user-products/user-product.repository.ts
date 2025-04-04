@@ -44,6 +44,16 @@ export class UserProductRepository {
     });
   }
 
+  async findAllFixedIncome(): Promise<any> {
+    try {
+      const product = await this.prisma.fixedIncomeInvestment.findMany();
+      return product;
+    } catch (error) {
+      console.log('Error finding Fixed Income Product:', error);
+      return null;
+    }
+  }
+
   async findFixedIncomeProduct(productId: string) {
     try {
       const product = await this.prisma.fixedIncomeInvestment.findUnique({
@@ -51,6 +61,16 @@ export class UserProductRepository {
           id: String(productId),
         },
       });
+      return product;
+    } catch (error) {
+      console.log('Error finding Fixed Income Product:', error);
+      return null;
+    }
+  }
+
+  async findAllRealEstate(): Promise<any> {
+    try {
+      const product = await this.prisma.realEstateFund.findMany();
       return product;
     } catch (error) {
       console.log('Error finding Fixed Income Product:', error);
@@ -72,6 +92,16 @@ export class UserProductRepository {
     }
   }
 
+  async findAllStocksProduct(): Promise<any> {
+    try {
+      const product = await this.prisma.stock.findMany();
+      return product;
+    } catch (error) {
+      console.log('Error finding Fixed Income Product:', error);
+      return null;
+    }
+  }
+
   async findStocksProduct(productId: string) {
     try {
       const product = await this.prisma.stock.findUnique({
@@ -79,6 +109,16 @@ export class UserProductRepository {
           id: String(productId),
         },
       });
+      return product;
+    } catch (error) {
+      console.log('Error finding Fixed Income Product:', error);
+      return null;
+    }
+  }
+
+  async findAllCryptoProduct(): Promise<any> {
+    try {
+      const product = await this.prisma.cryptocurrency.findMany();
       return product;
     } catch (error) {
       console.log('Error finding Fixed Income Product:', error);
