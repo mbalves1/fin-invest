@@ -23,7 +23,7 @@ export class UsersService {
         ? {
             create: products.map((product) => ({
               productId: product.productId,
-              quantity: product.quantity,
+              investedAmount: product.quantity,
             })),
           }
         : undefined,

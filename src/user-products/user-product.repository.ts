@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  Req,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';
 import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
@@ -144,7 +149,7 @@ export class UserProductRepository {
     userId: string,
     createInvestmentProductDto: CreateInvestmentProductDto,
   ): Promise<CreateInvestmentProductDto> {
-    const { productId, quantity, ...body } = createInvestmentProductDto;
+    const { productId, investedAmount, ...body } = createInvestmentProductDto;
 
     // Verifica se o produto existe em uma das tabelas
     const fixedIncome = await this.prisma.fixedIncomeInvestment.findUnique({
@@ -170,7 +175,7 @@ export class UserProductRepository {
 
     // Monta o objeto de conexão dinamicamente
     const investmentData: any = {
-      quantity: quantity,
+      investedAmount: investedAmount,
       purchasedAt: body.purchasedAt,
       user: {
         connect: { id: userId },
@@ -186,6 +191,27 @@ export class UserProductRepository {
     } else if (cryptocurrency) {
       investmentData.Cryptocurrency = { connect: { id: productId } };
     }
+
+    // Get currentPorfolio from user
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    const currentPortfolioValue = user.currentPortfolioValue;
+    const investedPortfolioValue = user.investedPortfolioValue;
+
+    if (investedAmount > currentPortfolioValue - investedPortfolioValue) {
+      throw new BadRequestException('Insufficient funds in portfolio');
+    }
+
+    // Altera o valor do investedPortfolioValue com valor do contrato
+    const updateUserInvestedValue = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        investedPortfolioValue: investedAmount + investedPortfolioValue,
+      },
+    });
+
+    console.log('>>', updateUserInvestedValue);
 
     // Cria o investimento apenas na tabela correspondente
     return await this.prisma.userInvestments.create({
@@ -230,7 +256,7 @@ export class UserProductRepository {
     investmentEntries.map((item) => {
       const product = {
         productId: item[1].productId,
-        quantity: item[1].quantity,
+        investedAmount: item[1].investedAmount,
         userId: userId,
       };
 

@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Req,
@@ -11,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { UserProductsService } from './user-products.service';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
-import { UpdateUserProductDto } from './dto/update-user-product.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
 import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';

@@ -13,7 +13,7 @@ export class CreateInvestmentProductDto {
   @IsInt()
   @Min(1, { message: 'A quantidade deve ser pelo menos 1.' })
   @Type(() => Number)
-  quantity: number;
+  investedAmount: number;
 
   @IsOptional()
   @Type(() => Date)

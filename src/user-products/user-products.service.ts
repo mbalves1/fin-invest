@@ -172,7 +172,7 @@ export class UserProductsService {
   async createSimpleAnInvestment(
     userId: string,
     createInvestmentProductDto: CreateInvestmentProductDto,
-  ): Promise<any> {
+  ): Promise<CreateInvestmentProductDto> {
     return await this.userProductRepo.createSimpleInvestment(
       userId,
       createInvestmentProductDto,

@@ -25,6 +25,7 @@ model User {
   riskTolerance           String? // Exemplo: 'Conservative', 'Moderate', 'Aggressive'
   investmentGoals         String? // Exemplo: 'retirement', 'compra de imovel', 'education'
   currentPortfolioValue   Float? // Ex: R$ 5000
+  investedPortfolioValue  Float? // Ex: R$ 1000
   preferredInvestmentType String? // Exemplo: 'stocks', 'fixed_income', 'real_estate_funds', 'crypto'
 
   @@map("users")
@@ -65,6 +66,7 @@ model FixedIncomeInvestment {
   taxation          String // Ex: IR, IOF, Isento
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  investedAmount    Float? // Quantidade investida
 
   users  UserInvestments[]
   User   User?             @relation(fields: [userId], references: [id])
@@ -118,10 +120,10 @@ model Cryptocurrency {
 }
 
 model UserInvestments {
-  id          String   @id @default(uuid())
-  userId      String
-  quantity    Int // Quantidade comprada
-  purchasedAt DateTime @default(now()) // Data da compra
+  id             String   @id @default(uuid())
+  userId         String
+  investedAmount Float // Quantidade comprada
+  purchasedAt    DateTime @default(now()) // Data da compra
 
   user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   FixedIncomeInvestment FixedIncomeInvestment? @relation(fields: [fixedIncomeId], references: [id])
