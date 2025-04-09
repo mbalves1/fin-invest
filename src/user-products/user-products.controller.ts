@@ -76,4 +76,14 @@ export class UserProductsController {
       createInvestmentProductDto,
     );
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/contract/:id')
+  async deleteInvestmentContract(
+    @Req() req,
+    @Param('id') id: string,
+  ): Promise<{ success: boolean }> {
+    const userId = req.user.id;
+    return this.userProductsService.deleteInvestmentContract(id, userId);
+  }
 }

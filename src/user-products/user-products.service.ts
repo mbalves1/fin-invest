@@ -1,5 +1,10 @@
 import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
-import { Injectable, Req } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  Req,
+} from '@nestjs/common';
 import { CreateUserProductDto } from './dto/create-user-product.dto';
 import { UpdateUserProductDto } from './dto/update-user-product.dto';
 import { UserProductRepository } from './user-product.repository';
@@ -172,5 +177,27 @@ export class UserProductsService {
       userId,
       createInvestmentProductDto,
     );
+  }
+
+  async deleteInvestmentContract(
+    contractId: string,
+    userId: string,
+  ): Promise<{ success: boolean }> {
+    const contract = await this.userProductRepo.findInvestmentById(contractId);
+
+    if (!contract) {
+      throw new NotFoundException('Investment not found!');
+    }
+
+    // Verificação de propriedade do contrato (regra de negócio)
+    if (contract.userId !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to delete this investment',
+      );
+    }
+
+    const deleted = await this.userProductRepo.deleteInvestment(contractId);
+
+    return { success: deleted };
   }
 }

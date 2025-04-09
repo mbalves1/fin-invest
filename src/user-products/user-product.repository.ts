@@ -243,4 +243,26 @@ export class UserProductRepository {
       timestamp: new Date(),
     };
   }
+
+  async findInvestmentById(contractId: string): Promise<any> {
+    return this.prisma.userInvestments.findUnique({
+      where: {
+        id: contractId,
+      },
+    });
+  }
+
+  async deleteInvestment(contractId: string): Promise<boolean> {
+    const deletedContract = await this.prisma.userInvestments.delete({
+      where: {
+        id: contractId,
+      },
+    });
+
+    if (deletedContract) {
+      return true;
+    } else {
+      throw new NotFoundException('Investment not found');
+    }
+  }
 }
