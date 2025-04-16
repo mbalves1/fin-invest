@@ -1,5 +1,6 @@
 import { CreateInvestmentContractDto } from './dto/create-contract-user-product.dto';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -169,14 +170,68 @@ export class UserProductsService {
     );
   }
 
-  async createSimpleAnInvestment(
+  async createSimpleInvestment(
     userId: string,
     createInvestmentProductDto: CreateInvestmentProductDto,
   ): Promise<CreateInvestmentProductDto> {
-    return await this.userProductRepo.createSimpleInvestment(
-      userId,
-      createInvestmentProductDto,
+    const { productId, investedAmount, ...body } = createInvestmentProductDto;
+
+    // 1. Verificar se o produto existe
+    const product = await this.userProductRepo.findProductById(
+      String(productId),
     );
+    if (!product) {
+      throw new NotFoundException('Product not found!');
+    }
+
+    // 2. Verificar saldo disponível do usuário
+    const user = await this.userProductRepo.getUserById(userId);
+    const availableFunds =
+      user.currentPortfolioValue - user.investedPortfolioValue;
+
+    if (investedAmount > availableFunds) {
+      throw new BadRequestException('Insufficient funds in portfolio');
+    }
+
+    // 3. Preparar dados de investimento
+    const investmentData = this.prepareInvestmentData(
+      userId,
+      product.type,
+      String(productId),
+      investedAmount,
+      body,
+    );
+
+    // 4. Atualizar saldo investido do usuário
+    const newInvestedValue = user.investedPortfolioValue + investedAmount;
+    await this.userProductRepo.updateUserInvestedValue(
+      userId,
+      newInvestedValue,
+    );
+
+    // 5. Criar o investimento
+    return await this.userProductRepo.createInvestment(investmentData);
+  }
+
+  private prepareInvestmentData(
+    userId: string,
+    productType: string,
+    productId: string,
+    investedAmount: number,
+    body: any,
+  ): any {
+    const data: any = {
+      investedAmount,
+      purchasedAt: body.purchasedAt,
+      user: {
+        connect: { id: userId },
+      },
+    };
+
+    // Conexão com o tipo específico de produto
+    data[productType] = { connect: { id: productId } };
+
+    return data;
   }
 
   async deleteInvestmentContract(

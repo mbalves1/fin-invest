@@ -145,83 +145,64 @@ export class UserProductRepository {
     }
   }
 
-  async createSimpleInvestment(
-    userId: string,
-    createInvestmentProductDto: CreateInvestmentProductDto,
-  ): Promise<CreateInvestmentProductDto> {
-    const { productId, investedAmount, ...body } = createInvestmentProductDto;
-
-    // Verifica se o produto existe em uma das tabelas
-    const fixedIncome = await this.prisma.fixedIncomeInvestment.findUnique({
-      where: { id: String(productId) },
-    });
-
-    const realEstateFund = await this.prisma.realEstateFund.findUnique({
-      where: { id: String(productId) },
-    });
-
-    const stock = await this.prisma.stock.findUnique({
-      where: { id: String(productId) },
-    });
-
-    const cryptocurrency = await this.prisma.cryptocurrency.findUnique({
-      where: { id: String(productId) },
-    });
-
-    // Se não encontrar o produto em nenhuma tabela, lança um erro
-    if (!fixedIncome && !realEstateFund && !stock && !cryptocurrency) {
-      throw new NotFoundException('Product not found!');
-    }
-
-    // Monta o objeto de conexão dinamicamente
-    const investmentData: any = {
-      investedAmount: investedAmount,
-      purchasedAt: body.purchasedAt,
-      user: {
-        connect: { id: userId },
-      },
-    };
-
-    if (fixedIncome) {
-      investmentData.FixedIncomeInvestment = { connect: { id: productId } };
-    } else if (realEstateFund) {
-      investmentData.RealEstateFund = { connect: { id: productId } };
-    } else if (stock) {
-      investmentData.Stock = { connect: { id: productId } };
-    } else if (cryptocurrency) {
-      investmentData.Cryptocurrency = { connect: { id: productId } };
-    }
-
-    // Get currentPorfolio from user
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    const currentPortfolioValue = user.currentPortfolioValue;
-    const investedPortfolioValue = user.investedPortfolioValue;
-
-    if (investedAmount > currentPortfolioValue - investedPortfolioValue) {
-      throw new BadRequestException('Insufficient funds in portfolio');
-    }
-
-    // Altera o valor do investedPortfolioValue com valor do contrato
-    const updateUserInvestedValue = await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        investedPortfolioValue: investedAmount + investedPortfolioValue,
-      },
-    });
-
-    console.log('>>', updateUserInvestedValue);
-
-    // Cria o investimento apenas na tabela correspondente
+  async createInvestment(data: any): Promise<any> {
     return await this.prisma.userInvestments.create({
-      data: investmentData,
+      data,
       include: {
         user: true,
         FixedIncomeInvestment: true,
         RealEstateFund: true,
         Stock: true,
         Cryptocurrency: true,
+      },
+    });
+  }
+
+  async findProductById(productId: string): Promise<any> {
+    // Busca em todas as tabelas
+    const fixedIncome = await this.prisma.fixedIncomeInvestment.findUnique({
+      where: { id: productId },
+    });
+
+    if (fixedIncome)
+      return { type: 'FixedIncomeInvestment', data: fixedIncome };
+
+    const realEstateFund = await this.prisma.realEstateFund.findUnique({
+      where: { id: productId },
+    });
+
+    if (realEstateFund) return { type: 'RealEstateFund', data: realEstateFund };
+
+    // Verificações para demais produtos...
+    const stock = await this.prisma.stock.findUnique({
+      where: { id: productId },
+    });
+
+    if (stock) return { type: 'Stock', data: stock };
+
+    const cryptocurrency = await this.prisma.cryptocurrency.findUnique({
+      where: { id: productId },
+    });
+
+    if (cryptocurrency) return { type: 'Cryptocurrency', data: cryptocurrency };
+
+    return null;
+  }
+
+  async getUserById(userId: string): Promise<any> {
+    return await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+  }
+
+  async updateUserInvestedValue(
+    userId: string,
+    newValue: number,
+  ): Promise<any> {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        investedPortfolioValue: newValue,
       },
     });
   }
@@ -260,7 +241,7 @@ export class UserProductRepository {
         userId: userId,
       };
 
-      this.createSimpleInvestment(userId, product);
+      this.createInvestment(product);
     });
 
     return {
