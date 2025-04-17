@@ -52,7 +52,7 @@ export class UserProductsController {
   async createInvestmentsContract(
     @Req() req,
     @Body() createInvestmentContractDto: CreateInvestmentContractDto,
-  ): Promise<CreateInvestmentContractDto> {
+  ): Promise<any> {
     const id = req.user.id;
 
     return this.userProductsService.createAnInvestments(
@@ -69,7 +69,7 @@ export class UserProductsController {
   ): Promise<CreateInvestmentProductDto> {
     const id = req.user.id;
 
-    return this.userProductsService.createSimpleAnInvestment(
+    return this.userProductsService.createSimpleInvestment(
       id,
       createInvestmentProductDto,
     );

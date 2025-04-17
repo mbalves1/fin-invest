@@ -146,7 +146,7 @@ export class UserProductRepository {
   }
 
   async createInvestment(data: any): Promise<any> {
-    return await this.prisma.userInvestments.create({
+    const mm = await this.prisma.userInvestments.create({
       data,
       include: {
         user: true,
@@ -156,6 +156,9 @@ export class UserProductRepository {
         Cryptocurrency: true,
       },
     });
+    console.log('Investment', mm);
+
+    return mm;
   }
 
   async findProductById(productId: string): Promise<any> {
@@ -207,48 +210,80 @@ export class UserProductRepository {
     });
   }
 
-  async createAnInvestment(
-    userId: string,
-    body: CreateInvestmentContractDto,
-  ): Promise<InvestmentResponse> {
-    // Buscar o produto de Renda Fixa
-    const fixedIncome = await this.prisma.fixedIncomeInvestment.findUnique({
-      where: { id: String(body?.fixed_income?.productId) },
+  // async createAnInvestment(
+  //   userId: string,
+  //   body: CreateInvestmentContractDto,
+  // ): Promise<InvestmentResponse> {
+  //   // Buscar o produto de Renda Fixa
+  //   const fixedIncome = await this.prisma.fixedIncomeInvestment.findUnique({
+  //     where: { id: String(body?.fixed_income?.productId) },
+  //   });
+
+  //   const realEstateFund = await this.prisma.realEstateFund.findUnique({
+  //     where: { id: String(body?.real_state?.productId) },
+  //   });
+
+  //   const stock = await this.prisma.stock.findUnique({
+  //     where: { id: String(body?.stock?.productId) },
+  //   });
+
+  //   const cryptocurrency = await this.prisma.cryptocurrency.findUnique({
+  //     where: { id: String(body?.crypto?.productId) },
+  //   });
+
+  //   // Se não encontrar o produto em nenhuma tabela, lança um erro
+  //   if (!fixedIncome && !realEstateFund && !stock && !cryptocurrency) {
+  //     throw new NotFoundException('Product not found!...');
+  //   }
+
+  //   const investmentEntries = Object.entries(body);
+  //   investmentEntries.map((item) => {
+  //     const product = {
+  //       productId: String(item[1].productId),
+  //       investedAmount: item[1].investedAmount,
+  //       userId: userId,
+  //     };
+
+  //     console.log('Product:', typeof String(item[1].productId));
+
+  //     this.createInvestment(product);
+  //   });
+
+  //   return {
+  //     message: 'Contract done',
+  //     success: true,
+  //     timestamp: new Date(),
+  //   };
+  // }
+
+  async findFixedIncomeById(id: string) {
+    return this.prisma.fixedIncomeInvestment.findUnique({
+      where: { id },
     });
+  }
 
-    const realEstateFund = await this.prisma.realEstateFund.findUnique({
-      where: { id: String(body?.real_state?.productId) },
+  async findRealEstateFundById(id: string) {
+    return this.prisma.realEstateFund.findUnique({
+      where: { id },
     });
+  }
 
-    const stock = await this.prisma.stock.findUnique({
-      where: { id: String(body?.stock?.productId) },
+  async findStockById(id: string) {
+    return this.prisma.stock.findUnique({
+      where: { id },
     });
+  }
 
-    const cryptocurrency = await this.prisma.cryptocurrency.findUnique({
-      where: { id: String(body?.crypto?.productId) },
+  async findCryptocurrencyById(id: string) {
+    return this.prisma.cryptocurrency.findUnique({
+      where: { id },
     });
+  }
 
-    // Se não encontrar o produto em nenhuma tabela, lança um erro
-    if (!fixedIncome && !realEstateFund && !stock && !cryptocurrency) {
-      throw new NotFoundException('Product not found!...');
-    }
-
-    const investmentEntries = Object.entries(body);
-    investmentEntries.map((item) => {
-      const product = {
-        productId: item[1].productId,
-        investedAmount: item[1].investedAmount,
-        userId: userId,
-      };
-
-      this.createInvestment(product);
+  async createGroupInvestment(investmentData: any): Promise<any> {
+    return this.prisma.userInvestments.create({
+      data: investmentData,
     });
-
-    return {
-      message: 'Contract done',
-      success: true,
-      timestamp: new Date(),
-    };
   }
 
   async findInvestmentById(contractId: string): Promise<any> {

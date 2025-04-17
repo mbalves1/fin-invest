@@ -15,6 +15,7 @@ import { ProductRepository } from 'src/products/product.repository';
 import { CreateInvestmentProductDto } from './dto/create-investment-product.dto';
 import { FixedIncome } from 'src/types/responseFixedIncomeTypes';
 import { StockTypes } from 'src/types/stockTypes';
+import { InvestmentResponse } from 'src/types/responseInvestmentsTypes';
 
 @Injectable()
 export class UserProductsService {
@@ -163,11 +164,68 @@ export class UserProductsService {
   async createAnInvestments(
     userId: string,
     createInvestmentContractDto: CreateInvestmentContractDto,
-  ): Promise<any> {
-    return await this.userProductRepo.createAnInvestment(
-      userId,
-      createInvestmentContractDto,
-    );
+  ): Promise<InvestmentResponse> {
+    // Verificar qual produto está sendo investido
+    const { fixed_income, real_state, stock, crypto } =
+      createInvestmentContractDto;
+
+    // Buscar produtos em paralelo para melhor performance
+    const [fixedIncome, realEstateFund, stockProduct, cryptocurrency] =
+      await Promise.all([
+        fixed_income?.productId
+          ? this.userProductRepo.findFixedIncomeById(
+              String(fixed_income.productId),
+            )
+          : null,
+        real_state?.productId
+          ? this.userProductRepo.findRealEstateFundById(
+              String(real_state.productId),
+            )
+          : null,
+        stock?.productId
+          ? this.userProductRepo.findStockById(String(stock.productId))
+          : null,
+        crypto?.productId
+          ? this.userProductRepo.findCryptocurrencyById(
+              String(crypto.productId),
+            )
+          : null,
+      ]);
+
+    // Verificar se pelo menos um produto foi encontrado
+    if (!fixedIncome && !realEstateFund && !stockProduct && !cryptocurrency) {
+      throw new NotFoundException('Product not found!...');
+    }
+
+    // Mapeamento de chaves para tipos de relação
+    const productTypeMap = {
+      fixed_income: 'FixedIncomeInvestment',
+      real_state: 'RealEstateFund',
+      stock: 'Stock',
+      crypto: 'Cryptocurrency',
+    };
+
+    // Processar cada investimento
+    const investmentPromises = Object.entries(createInvestmentContractDto)
+      .filter(([key, value]) => value && value.productId && productTypeMap[key]) // Filtra entradas válidas
+      .map(([key, value]) => {
+        // Usar o método prepareInvestmentData para formatar corretamente os dados
+        const data = this.prepareInvestmentData(
+          userId,
+          productTypeMap[key], // Passa o tipo correto baseado na chave
+          String(value.productId),
+          value.investedAmount,
+          createInvestmentContractDto,
+        );
+
+        console.log(`Investment for ${productTypeMap[key]}:`, data);
+        return this.userProductRepo.createInvestment(data);
+      });
+
+    // Aguardar a criação de todos os investimentos
+    await Promise.all(investmentPromises);
+
+    return;
   }
 
   async createSimpleInvestment(
