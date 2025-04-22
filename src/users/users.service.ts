@@ -45,4 +45,14 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+
+  async me(id: string): Promise<CreateUserDto> {
+    const user = await this.userRepo.findByIdMe(id);
+
+    if (!user) {
+      throw new ConflictException('User not found');
+    }
+
+    return user;
+  }
 }

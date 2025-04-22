@@ -74,4 +74,19 @@ export class UserRepository {
       },
     });
   }
+
+  async findByIdMe(id: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        products: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found!');
+    }
+
+    return user;
+  }
 }
